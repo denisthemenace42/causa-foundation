@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Remove static export for better Netlify compatibility
-  // output: 'export',
+  // Use static export for Netlify compatibility
+  output: 'export',
   // Remove trailingSlash for proper routing
   // trailingSlash: true,
   images: {

@@ -6,10 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "export": "next build && next export"
   },
   "dependencies": {
-    "@netlify/next": "^1.4.9",
     "autoprefixer": "^10.4.16",
     "framer-motion": "^10.16.4",
     "lucide-react": "^0.292.0",

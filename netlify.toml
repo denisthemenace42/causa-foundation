@@ -1,13 +1,9 @@
 [build]
   command = "npm run build"
-  publish = ".next"
+  publish = "out"
 
 [build.environment]
   NODE_VERSION = "18"
-
-# Functions directory
-[functions]
-  directory = "netlify/functions"
 
 # Force HTTPS redirects
 [[redirects]]
@@ -22,16 +18,31 @@
   status = 301
   force = true
 
-# Handle Next.js static assets
+# Handle static files
 [[redirects]]
-  from = "/_next/*"
-  to = "/_next/:splat"
+  from = "/*.js"
+  to = "/:splat"
   status = 200
 
-# Handle all routes through Next.js
+[[redirects]]
+  from = "/*.css"
+  to = "/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/*.png"
+  to = "/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/*.svg"
+  to = "/:splat"
+  status = 200
+
+# Handle all other routes (SPA fallback)
 [[redirects]]
   from = "/*"
-  to = "/.netlify/functions/next"
+  to = "/index.html"
   status = 200
 
 # Security headers with HTTPS enforcement
