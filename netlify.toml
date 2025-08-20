@@ -5,6 +5,10 @@
 [build.environment]
   NODE_VERSION = "18"
 
+# Functions directory
+[functions]
+  directory = "netlify/functions"
+
 # Force HTTPS redirects
 [[redirects]]
   from = "http://causafoundation.com/*"
@@ -17,6 +21,25 @@
   to = "https://causafoundation.com/:splat"
   status = 301
   force = true
+
+# Handle static HTML files first (before Next.js routes)
+[[redirects]]
+  from = "/contact.html"
+  to = "/contact.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/success.html"
+  to = "/success.html"
+  status = 200
+  force = true
+
+# Handle Netlify functions
+[[redirects]]
+  from = "/.netlify/functions/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
 
 # Handle Next.js static assets
 [[redirects]]
