@@ -1,9 +1,22 @@
 [build]
   command = "npm run build"
-  publish = "out"
+  publish = ".next"
 
 [build.environment]
   NODE_VERSION = "18"
+
+# Force HTTPS redirects
+[[redirects]]
+  from = "http://causafoundation.com/*"
+  to = "https://causafoundation.com/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "http://www.causafoundation.com/*"
+  to = "https://causafoundation.com/:splat"
+  status = 301
+  force = true
 
 # Handle Next.js static assets
 [[redirects]]
@@ -38,7 +51,7 @@
   to = "/index.html"
   status = 200
 
-# Security headers
+# Security headers with HTTPS enforcement
 [[headers]]
   for = "/*"
   [headers.values]
@@ -46,4 +59,13 @@
     X-XSS-Protection = "1; mode=block"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:;"
+    Content-Security-Policy = "default-src 'self' https:; script-src 'self' 'unsafe-eval' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; font-src 'self' data: https:;"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
+
+# Form handling
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, POST, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type"

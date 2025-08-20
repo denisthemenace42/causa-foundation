@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Send, CheckCircle, Code, Palette, Shield, Database, Globe, Users } from 'lucide-react'
+import { Send, CheckCircle, Code, Palette, Shield, Database, Globe, Users, AlertCircle } from 'lucide-react'
 
 interface JoinUsProps {
   locale: string
@@ -18,6 +18,8 @@ export default function JoinUs({ locale }: JoinUsProps) {
     contribution: ''
   })
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState('')
 
   const content = {
     en: {
@@ -76,13 +78,65 @@ export default function JoinUs({ locale }: JoinUsProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsSubmitted(true)
-    // Here you would typically send the form data to your backend
-    console.log('Form submitted:', formData)
+    setIsSubmitting(true)
+    setError('')
+
+    try {
+      // Production: submit to Netlify Forms
+      const formDataToSend = new FormData()
+      formDataToSend.append('form-name', 'join-us-form')
+      formDataToSend.append('name', formData.name)
+      formDataToSend.append('email', formData.email)
+      formDataToSend.append('specialty', formData.specialty)
+      formDataToSend.append('experience', formData.experience)
+      formDataToSend.append('motivation', formData.motivation)
+      formDataToSend.append('contribution', formData.contribution)
+      formDataToSend.append('submitted_at', new Date().toISOString())
+      formDataToSend.append('locale', locale)
+
+      const response = await fetch('/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams(formDataToSend as any).toString()
+      })
+
+      if (response.ok) {
+        setIsSubmitted(true)
+        // Also send to our API for additional processing
+        await sendToCustomEndpoint()
+      } else {
+        throw new Error('Form submission failed')
+      }
+    } catch (err) {
+      console.error('Form submission error:', err)
+      setError(locale === 'bg' ? 'Грешка при изпращане. Моля, опитайте отново.' : 'Submission error. Please try again.')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  // Send to our API endpoint for additional processing
+  const sendToCustomEndpoint = async () => {
+    try {
+      await fetch('/api/submit-form', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...formData,
+          submitted_at: new Date().toISOString(),
+          locale
+        })
+      })
+    } catch (err) {
+      console.error('Custom endpoint error:', err)
+      // Don't fail the form if this fails
+    }
   }
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
+    // Clear error when user starts typing
+    if (error) setError('')
   }
 
   if (isSubmitted) {
@@ -125,6 +179,7 @@ export default function JoinUs({ locale }: JoinUsProps) {
                   motivation: '',
                   contribution: ''
                 })
+                setError('')
               }}
               className="btn-primary"
             >
@@ -164,7 +219,34 @@ export default function JoinUs({ locale }: JoinUsProps) {
             viewport={{ once: true }}
             className="bg-white rounded-2xl shadow-2xl p-8"
           >
+            {/* Development Mode Indicator */}
+            {/* Removed development mode indicator */}
+
+            {/* Hidden form for Netlify */}
+            <form name="join-us-form" method="POST" data-netlify="true" data-netlify-honeypot="bot-field" hidden>
+              <input type="text" name="name" />
+              <input type="email" name="email" />
+              <select name="specialty"></select>
+              <select name="experience"></select>
+              <textarea name="motivation"></textarea>
+              <textarea name="contribution"></textarea>
+              <input type="hidden" name="submitted_at" />
+              <input type="hidden" name="locale" />
+            </form>
+
             <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Error Message */}
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700"
+                >
+                  <AlertCircle size={20} />
+                  <span className="text-sm">{error}</span>
+                </motion.div>
+              )}
+
               {/* Name */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -177,6 +259,7 @@ export default function JoinUs({ locale }: JoinUsProps) {
                   onChange={(e) => handleInputChange('name', e.target.value)}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
                   placeholder={locale === 'bg' ? 'Въведете вашето име' : 'Enter your full name'}
+                  disabled={isSubmitting}
                 />
               </div>
 
@@ -192,6 +275,7 @@ export default function JoinUs({ locale }: JoinUsProps) {
                   onChange={(e) => handleInputChange('email', e.target.value)}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
                   placeholder={locale === 'bg' ? 'Въведете вашия имейл' : 'Enter your email address'}
+                  disabled={isSubmitting}
                 />
               </div>
 
@@ -205,6 +289,7 @@ export default function JoinUs({ locale }: JoinUsProps) {
                   value={formData.specialty}
                   onChange={(e) => handleInputChange('specialty', e.target.value)}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
+                  disabled={isSubmitting}
                 >
                   <option value="">
                     {locale === 'bg' ? 'Изберете специализация' : 'Select your specialty'}
@@ -227,6 +312,7 @@ export default function JoinUs({ locale }: JoinUsProps) {
                   value={formData.experience}
                   onChange={(e) => handleInputChange('experience', e.target.value)}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
+                  disabled={isSubmitting}
                 >
                   <option value="">
                     {locale === 'bg' ? 'Изберете опит' : 'Select experience level'}
@@ -250,6 +336,7 @@ export default function JoinUs({ locale }: JoinUsProps) {
                   onChange={(e) => handleInputChange('motivation', e.target.value)}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 resize-none"
                   placeholder={locale === 'bg' ? 'Разкажете ни защо искате да се присъедините...' : 'Tell us why you want to join...'}
+                  disabled={isSubmitting}
                 />
               </div>
 
@@ -265,6 +352,7 @@ export default function JoinUs({ locale }: JoinUsProps) {
                   onChange={(e) => handleInputChange('contribution', e.target.value)}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 resize-none"
                   placeholder={locale === 'bg' ? 'Обяснете как можете да допринесете...' : 'Explain how you can contribute...'}
+                  disabled={isSubmitting}
                 />
               </div>
 
@@ -272,10 +360,20 @@ export default function JoinUs({ locale }: JoinUsProps) {
                 type="submit"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="w-full btn-primary flex items-center justify-center gap-2"
+                disabled={isSubmitting}
+                className="w-full btn-primary flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <Send size={20} />
-                {currentContent.form.submit}
+                {isSubmitting ? (
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                    {currentContent.form.submitting}
+                  </>
+                ) : (
+                  <>
+                    <Send size={20} />
+                    {currentContent.form.submit}
+                  </>
+                )}
               </motion.button>
             </form>
           </motion.div>
