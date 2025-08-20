@@ -102,9 +102,11 @@ export default function JoinUs({ locale }: JoinUsProps) {
       })
 
       if (response.ok) {
-        setIsSubmitted(true)
         // Also send to our API for additional processing
         await sendToCustomEndpoint()
+        
+        // Redirect to success page
+        window.location.href = '/success'
       } else {
         throw new Error('Form submission failed')
       }
@@ -235,7 +237,7 @@ export default function JoinUs({ locale }: JoinUsProps) {
               <input type="hidden" name="locale" />
             </form>
 
-            <form onSubmit={handleSubmit} className="space-y-6" data-netlify="true" name="join-us-form">
+            <form onSubmit={handleSubmit} className="space-y-6" data-netlify="true" name="join-us-form" action="/success" method="POST">
               {/* Error Message */}
               {error && (
                 <motion.div
@@ -364,6 +366,7 @@ export default function JoinUs({ locale }: JoinUsProps) {
               </div>
 
               {/* Hidden fields for Netlify */}
+              <input type="hidden" name="form-name" value="join-us-form" />
               <input type="hidden" name="submitted_at" />
               <input type="hidden" name="locale" />
 
