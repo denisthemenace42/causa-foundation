@@ -45,13 +45,6 @@
   to = "/:splat"
   status = 200
 
-# Handle form submissions
-[[redirects]]
-  from = "/"
-  to = "/index.html"
-  status = 200
-  conditions = {Role = ["admin"]}
-
 # Handle all other routes (SPA fallback)
 [[redirects]]
   from = "/*"
@@ -76,7 +69,3 @@
     Access-Control-Allow-Origin = "*"
     Access-Control-Allow-Methods = "GET, POST, OPTIONS"
     Access-Control-Allow-Headers = "Content-Type"
-
-# Ensure forms are processed
-[functions]
-  directory = "netlify/functions"

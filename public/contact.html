@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Form - Causa Foundation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .form-container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h1>Join Our Community</h1>
+        
+        <form name="join-us-form" method="POST" data-netlify="true" action="/success">
+            <input type="hidden" name="form-name" value="join-us-form" />
+            
+            <div class="form-group">
+                <label for="name">Full Name *</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email Address *</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="specialty">Specialty *</label>
+                <select id="specialty" name="specialty" required>
+                    <option value="">Select your specialty</option>
+                    <option value="frontend">Front-End Development</option>
+                    <option value="backend">Back-End Development</option>
+                    <option value="sql">SQL & Database</option>
+                    <option value="security">Security</option>
+                    <option value="design">Design & UX</option>
+                    <option value="blockchain">Blockchain Development</option>
+                    <option value="community">Community Management</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="experience">Years of Experience *</label>
+                <select id="experience" name="experience" required>
+                    <option value="">Select experience level</option>
+                    <option value="0-1">0-1 year</option>
+                    <option value="1-3">1-3 years</option>
+                    <option value="3-5">3-5 years</option>
+                    <option value="5+">5+ years</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="motivation">Why do you want to join our community? *</label>
+                <textarea id="motivation" name="motivation" rows="4" required></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="contribution">How can you contribute to our mission? *</label>
+                <textarea id="contribution" name="contribution" rows="4" required></textarea>
+            </div>
+            
+            <button type="submit">Submit Application</button>
+        </form>
+        
+        <div id="success-message" class="success" style="display: none;">
+            <h3>🎉 Application Submitted Successfully!</h3>
+            <p>Thank you for your application. We'll get back to you soon!</p>
+        </div>
+    </div>
+
+    <script>
+        // Handle form submission
+        document.querySelector('form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const submitButton = document.querySelector('button[type="submit"]');
+            const successMessage = document.getElementById('success-message');
+            
+            // Disable button and show loading
+            submitButton.textContent = 'Submitting...';
+            submitButton.disabled = true;
+            
+            // Submit to Netlify
+            fetch('/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams(formData).toString()
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Show success message
+                    successMessage.style.display = 'block';
+                    this.reset();
+                    
+                    // Scroll to success message
+                    successMessage.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    throw new Error('Submission failed');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Submission failed. Please try again.');
+            })
+            .finally(() => {
+                // Reset button
+                submitButton.textContent = 'Submit Application';
+                submitButton.disabled = false;
+            });
+        });
+    </script>
+</body>
+</html>
