@@ -5,10 +5,6 @@
 [build.environment]
   NODE_VERSION = "18"
 
-# Functions directory
-[functions]
-  directory = "netlify/functions"
-
 # Force HTTPS redirects
 [[redirects]]
   from = "http://causafoundation.com/*"
@@ -22,50 +18,10 @@
   status = 301
   force = true
 
-# Handle static HTML files first (before Next.js routes)
-[[redirects]]
-  from = "/contact.html"
-  to = "/contact.html"
-  status = 200
-  force = true
-
-[[redirects]]
-  from = "/success.html"
-  to = "/success.html"
-  status = 200
-  force = true
-
-# Handle Netlify functions
-[[redirects]]
-  from = "/.netlify/functions/*"
-  to = "/.netlify/functions/:splat"
-  status = 200
-
 # Handle Next.js static assets
 [[redirects]]
   from = "/_next/*"
   to = "/_next/:splat"
-  status = 200
-
-# Handle static files
-[[redirects]]
-  from = "/*.js"
-  to = "/:splat"
-  status = 200
-
-[[redirects]]
-  from = "/*.css"
-  to = "/:splat"
-  status = 200
-
-[[redirects]]
-  from = "/*.png"
-  to = "/:splat"
-  status = 200
-
-[[redirects]]
-  from = "/*.svg"
-  to = "/:splat"
   status = 200
 
 # Handle all other routes (SPA fallback)
@@ -84,11 +40,3 @@
     Referrer-Policy = "strict-origin-when-cross-origin"
     Content-Security-Policy = "default-src 'self' https:; script-src 'self' 'unsafe-eval' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; font-src 'self' data: https:;"
     Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
-
-# Form handling
-[[headers]]
-  for = "/api/*"
-  [headers.values]
-    Access-Control-Allow-Origin = "*"
-    Access-Control-Allow-Methods = "GET, POST, OPTIONS"
-    Access-Control-Allow-Headers = "Content-Type"
