@@ -5,6 +5,10 @@
 [build.environment]
   NODE_VERSION = "18"
 
+# Functions directory
+[functions]
+  directory = "netlify/functions"
+
 # Force HTTPS redirects
 [[redirects]]
   from = "http://causafoundation.com/*"
@@ -24,10 +28,10 @@
   to = "/_next/:splat"
   status = 200
 
-# Handle all other routes (SPA fallback)
+# Handle all routes through Next.js
 [[redirects]]
   from = "/*"
-  to = "/index.html"
+  to = "/.netlify/functions/next"
   status = 200
 
 # Security headers with HTTPS enforcement
