@@ -82,7 +82,7 @@ export default function JoinUs({ locale }: JoinUsProps) {
     setError('')
 
     try {
-      // Production: submit to Netlify Forms
+      // Create form data for submission
       const formDataToSend = new FormData()
       formDataToSend.append('form-name', 'join-us-form')
       formDataToSend.append('name', formData.name)
@@ -94,6 +94,7 @@ export default function JoinUs({ locale }: JoinUsProps) {
       formDataToSend.append('submitted_at', new Date().toISOString())
       formDataToSend.append('locale', locale)
 
+      // Submit to Netlify Forms
       const response = await fetch('/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -234,7 +235,7 @@ export default function JoinUs({ locale }: JoinUsProps) {
               <input type="hidden" name="locale" />
             </form>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6" data-netlify="true" name="join-us-form">
               {/* Error Message */}
               {error && (
                 <motion.div
@@ -254,6 +255,7 @@ export default function JoinUs({ locale }: JoinUsProps) {
                 </label>
                 <input
                   type="text"
+                  name="name"
                   required
                   value={formData.name}
                   onChange={(e) => handleInputChange('name', e.target.value)}
@@ -270,6 +272,7 @@ export default function JoinUs({ locale }: JoinUsProps) {
                 </label>
                 <input
                   type="email"
+                  name="email"
                   required
                   value={formData.email}
                   onChange={(e) => handleInputChange('email', e.target.value)}
@@ -285,6 +288,7 @@ export default function JoinUs({ locale }: JoinUsProps) {
                   {currentContent.form.specialty}
                 </label>
                 <select
+                  name="specialty"
                   required
                   value={formData.specialty}
                   onChange={(e) => handleInputChange('specialty', e.target.value)}
@@ -308,6 +312,7 @@ export default function JoinUs({ locale }: JoinUsProps) {
                   {currentContent.form.experience}
                 </label>
                 <select
+                  name="experience"
                   required
                   value={formData.experience}
                   onChange={(e) => handleInputChange('experience', e.target.value)}
@@ -330,6 +335,7 @@ export default function JoinUs({ locale }: JoinUsProps) {
                   {currentContent.form.motivation}
                 </label>
                 <textarea
+                  name="motivation"
                   required
                   rows={4}
                   value={formData.motivation}
@@ -346,6 +352,7 @@ export default function JoinUs({ locale }: JoinUsProps) {
                   {currentContent.form.contribution}
                 </label>
                 <textarea
+                  name="contribution"
                   required
                   rows={4}
                   value={formData.contribution}
@@ -355,6 +362,10 @@ export default function JoinUs({ locale }: JoinUsProps) {
                   disabled={isSubmitting}
                 />
               </div>
+
+              {/* Hidden fields for Netlify */}
+              <input type="hidden" name="submitted_at" />
+              <input type="hidden" name="locale" />
 
               <motion.button
                 type="submit"
